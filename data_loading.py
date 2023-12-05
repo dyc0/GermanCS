@@ -1,7 +1,4 @@
-import re
-
-
-def create_word_lists(data: list) -> tuple(list, list):
+def create_word_lists(data: list) -> tuple:
     """Function to extract word lists for STT and human transcripts.
     Removes all @ annotations from human transcript and classifies the output
     according to whether the utterance is in German or English, where German is
