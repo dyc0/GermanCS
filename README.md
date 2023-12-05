@@ -5,6 +5,7 @@
 ---
 
 | Date | Goal |
+| ---- | ---- |
 | 7. 12. | Working ToungeSwitcher fine-tuning |
 | 8. 12. | Working pipeline |
 | 9. 12. | Synthetic data generation (naive) |
