@@ -27,7 +27,7 @@ def encode_sentence(
     """
 
     # Adding annotation for sentence beginning and end
-    # TODO: There is probably safer way to do this
+    # TODO: There is probably a safer way to do this
     sentence_ = "[CLS] " + sentence + " [SEP]"
 
     # Tokenize, extract dictionary ids, and set
