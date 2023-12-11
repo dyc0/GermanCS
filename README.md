@@ -7,9 +7,9 @@
 | Date | Goal |
 | ---- | ---- |
 | 7. 12. | Working ToungeSwitcher fine-tuning |
-| 8. 12. | Working pipeline | ✔️
+| 8. 12. | Working pipeline ✔️ |
 | 9. 12. | Synthetic data generation (naive) |
-| 9. 12. | Grammar and semantic info | ✔ (ready, but not run)
+| 9. 12. | Grammar and semantic info ✔ (ready, but not run) | 
 | 10. 12. | BERT finetuning |
 | 11. 12. | Various experiments | 
 | 18. 12. | Final report |
