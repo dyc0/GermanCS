@@ -31,7 +31,7 @@ def encode_sentence(
     sentence_ = "[CLS] " + sentence + " [SEP]"
 
     # Tokenize, extract dictionary ids, and set
-    # segment ids to 1 (we use just 1 sentence)
+    # segment ids to 1 (we use outputs/BERT_GRAM/bert_gram_pipeline.ipynbjust 1 sentence)
     tokens = tokenizer.tokenize(sentence_)
     indexed_tokens = tokenizer.convert_tokens_to_ids(tokens)
     segments_ids = [1] * len(tokens)  # The whole text is just one sentence

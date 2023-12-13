@@ -1,4 +1,7 @@
 import math
+import random as rnd
+from tqdm import tqdm
+from googletrans import Translator
 
 
 def create_word_lists(data: list) -> tuple:

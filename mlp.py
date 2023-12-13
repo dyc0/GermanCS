@@ -122,6 +122,7 @@ def train_model(
     optimizer: torch.optim,
     loader: DataLoader,
     n_epochs:int = 20,
+    class_weights = torch.tensor([1, 1], dtype=torch.float),
     device:str = 'cpu'
 ) -> float:
     """Trains the model for a specified number of epochs.
@@ -132,6 +133,7 @@ def train_model(
         optimizer (torch.optim): Optimizer.
         loader (DataLoader): Loader for train data.
         n_epochs (int, optional): Number of epochs to train. Defaults to 20.
+        class_weights (torch.tensor, optional): Tensor of class weights to pass to loss function.
         device (str): Name of the device to store the tensors on. Defaults to 'cpu'.
 
     Returns:
@@ -144,11 +146,15 @@ def train_model(
         for inputs, labels in loader:
             inputs, labels = inputs.to(device), labels.to(device)
 
+            weights = labels*class_weights.to(device)[1] + (1-labels)*class_weights.to(device)[0]
+
             optimizer.zero_grad()
 
             outputs = model(inputs)
             outputs = torch.squeeze(outputs, dim=1)
-            loss = criterion(outputs, labels.to(torch.float))
+
+            per_element_loss = criterion(outputs, labels.to(torch.float))
+            loss = torch.mean(weights*per_element_loss)
 
             loss.backward()
             optimizer.step()
@@ -159,7 +165,11 @@ def train_model(
 
 
 def validate_model(
-    model: nn.Module, criterion: nn.modules.loss, loader: DataLoader, device:str = 'cpu'
+    model: nn.Module,
+    criterion: nn.modules.loss,
+    loader: DataLoader,
+    class_weights = torch.tensor([1, 1], dtype=torch.float),
+    device:str = 'cpu'
 ) -> float:
     """Calculates loss on validation dataset.
 
@@ -167,6 +177,7 @@ def validate_model(
         model (nn.Module): Trained model.
         criterion (nn.modules.loss): Loss function.
         loader (DataLoader): Loader for validation data.
+        class_weights (torch.tensor, optional): Tensor of class weights to pass to loss function.
         device (str): Name of the device to store the tensors on. Defaults to 'cpu'.
 
     Returns:
@@ -177,10 +188,14 @@ def validate_model(
     with torch.no_grad():
         for inputs, labels in loader:
             inputs, labels = inputs.to(device), labels.to(device)
+            
+            weights = labels*class_weights.to(device)[1] + (1-labels)*class_weights.to(device)[0]
 
             pred = model(inputs)
             pred = torch.squeeze(pred, dim=1)
-            loss = criterion(pred, labels.to(torch.float)).item()
+
+            per_element_loss = criterion(pred, labels.to(torch.float))
+            loss = torch.mean(weights*per_element_loss).item()
  
     return loss
 
@@ -194,6 +209,7 @@ def cross_validate_model(
     splitter,
     n_epochs: int = 20,
     batch_size: int = 128,
+    class_weights: torch.tensor = torch.tensor([1, 1], dtype=torch.float),
     num_workers: int = 0,
     device='cpu'
 ) -> tuple:
@@ -208,6 +224,8 @@ def cross_validate_model(
         splitter (any): Function that splits the data for cross-validation.
         n_epochs (int, optional): Number of epochs to train. Defaults to 20.
         batch_size (int, optional): Training batch size. Defaults to 128.
+        class_weights (torch.tensor, optional): How much should classes be weighted when
+        calculating loss.
         num_workers (int, optional): Number of cores used for training and validation.
         Defaults to 16.
         device (str): Name of the device to store the tensors on. Defaults to 'cpu'.
@@ -233,8 +251,10 @@ def cross_validate_model(
         )
 
         # Train and validate model
-        tr_loss = train_model(model, criterion, optimizer, tr_loader, n_epochs=n_epochs, device=device)
-        va_loss = validate_model(model, criterion, va_loader, device=device)
+        tr_loss = train_model(
+            model, criterion, optimizer, tr_loader, n_epochs=n_epochs, device=device, class_weights=class_weights
+        )
+        va_loss = validate_model(model, criterion, va_loader, device=device, class_weights=class_weights)
 
         # Add results to appropriate lists and reset model weights
         training_losses.append(tr_loss)

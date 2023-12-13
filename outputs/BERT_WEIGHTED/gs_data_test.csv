@@ -1,0 +1,1 @@
+epochs,hidden_layers,neurons_per_layer,learning_rate,tr_loss,tr_loss_std,te_loss,te_loss_std
