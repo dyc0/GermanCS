@@ -121,9 +121,9 @@ def train_model(
     criterion: nn.modules.loss,
     optimizer: torch.optim,
     loader: DataLoader,
-    n_epochs:int = 20,
-    class_weights = torch.tensor([1, 1], dtype=torch.float),
-    device:str = 'cpu'
+    n_epochs: int = 20,
+    class_weights=torch.tensor([1, 1], dtype=torch.float),
+    device: str = "cpu",
 ) -> float:
     """Trains the model for a specified number of epochs.
 
@@ -146,7 +146,10 @@ def train_model(
         for inputs, labels in loader:
             inputs, labels = inputs.to(device), labels.to(device)
 
-            weights = labels*class_weights.to(device)[1] + (1-labels)*class_weights.to(device)[0]
+            weights = (
+                labels * class_weights.to(device)[1]
+                + (1 - labels) * class_weights.to(device)[0]
+            )
 
             optimizer.zero_grad()
 
@@ -154,7 +157,7 @@ def train_model(
             outputs = torch.squeeze(outputs, dim=1)
 
             per_element_loss = criterion(outputs, labels.to(torch.float))
-            loss = torch.mean(weights*per_element_loss)
+            loss = torch.mean(weights * per_element_loss)
 
             loss.backward()
             optimizer.step()
@@ -168,8 +171,8 @@ def validate_model(
     model: nn.Module,
     criterion: nn.modules.loss,
     loader: DataLoader,
-    class_weights = torch.tensor([1, 1], dtype=torch.float),
-    device:str = 'cpu'
+    class_weights=torch.tensor([1, 1], dtype=torch.float),
+    device: str = "cpu",
 ) -> float:
     """Calculates loss on validation dataset.
 
@@ -188,15 +191,18 @@ def validate_model(
     with torch.no_grad():
         for inputs, labels in loader:
             inputs, labels = inputs.to(device), labels.to(device)
-            
-            weights = labels*class_weights.to(device)[1] + (1-labels)*class_weights.to(device)[0]
+
+            weights = (
+                labels * class_weights.to(device)[1]
+                + (1 - labels) * class_weights.to(device)[0]
+            )
 
             pred = model(inputs)
             pred = torch.squeeze(pred, dim=1)
 
             per_element_loss = criterion(pred, labels.to(torch.float))
-            loss = torch.mean(weights*per_element_loss).item()
- 
+            loss = torch.mean(weights * per_element_loss).item()
+
     return loss
 
 
@@ -211,7 +217,7 @@ def cross_validate_model(
     batch_size: int = 128,
     class_weights: torch.tensor = torch.tensor([1, 1], dtype=torch.float),
     num_workers: int = 0,
-    device='cpu'
+    device="cpu",
 ) -> tuple:
     """Function for model cross-validation.
 
@@ -252,9 +258,17 @@ def cross_validate_model(
 
         # Train and validate model
         tr_loss = train_model(
-            model, criterion, optimizer, tr_loader, n_epochs=n_epochs, device=device, class_weights=class_weights
+            model,
+            criterion,
+            optimizer,
+            tr_loader,
+            n_epochs=n_epochs,
+            device=device,
+            class_weights=class_weights,
         )
-        va_loss = validate_model(model, criterion, va_loader, device=device, class_weights=class_weights)
+        va_loss = validate_model(
+            model, criterion, va_loader, device=device, class_weights=class_weights
+        )
 
         # Add results to appropriate lists and reset model weights
         training_losses.append(tr_loss)
