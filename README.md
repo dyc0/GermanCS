@@ -30,7 +30,6 @@ The filestructure for the project is as follows:
  - `translation.py` contains functions for augmenting the dataset.
  - `tsBERT_data_processing` contains functions for data processing in tsBERT pipeline.
 
- - `data` folder contains the .json dataset.
  - `BERT_MLP_variants` contains multiple variants of the BERT-MLP pipeline that were tested for the project.
     - each folder contains a .ipynb file with pipeline implementation and .csv files with results.
     - `gs_data_test.csv` contains results of grid-search, if it was performed.
@@ -53,6 +52,8 @@ Dependencies needed to run the notebooks in this repository:
 - transformers
 
 They can be installed using pip.
+
+Please note that this repo does not contain the data used for training the models.
 
 
 ## Authors
